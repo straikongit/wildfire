@@ -12,8 +12,14 @@ import (
 	//	"image/color"
 
 	"image/png"
+	"math/rand"
 	"os"
+	"time"
+	//	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
+
+//var imgTree *ebiten.Image
+//var imgFire *ebiten.Image
 
 func Printme() {
 	fmt.Println("Printme")
@@ -34,9 +40,10 @@ type SubImager interface {
 
 func (m *Map) Load(filename string) image.Image {
 	f, err := os.Open(filename)
-
+	defer f.Close()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		panic(err)
 	}
 
 	img, err := png.Decode(f)
@@ -51,7 +58,7 @@ func (m *Map) Load(filename string) image.Image {
 
 }
 
-func (m *Map) MakeSubImages(img image.Image) {
+func (m *Map) MakeMapSubImages(img image.Image) {
 	log.Println(m.Width, m.TileWidth, m.TileHeight)
 	si, ok := (img).(SubImager)
 	if !ok {
@@ -75,6 +82,7 @@ func (m *Map) MakeSubImages(img image.Image) {
 
 func (m *Map) MakeTileProperties(g **Game, img image.Image) {
 	//tiles := g.Tiles
+	rand.Seed(time.Now().Unix())
 	var xx Game
 	xx = **g
 	//fmt.Println(xx)
@@ -88,9 +96,12 @@ func (m *Map) MakeTileProperties(g **Game, img image.Image) {
 			//c := color.RGBAModel.Convert(pixel).(color.RGBA)
 			if b > g && b > r {
 				xx.Tiles[int(x/gd.TileWidth)][int(y/gd.TileHeight)].Properties["isWater"] = true
+				rand.Intn(gd.TileWidth)
 
 			} else if g > r && g > b {
 				xx.Tiles[int(x/gd.TileWidth)][int(y/gd.TileHeight)].Properties["isForest"] = true
+				xx.Tiles[int(x/gd.TileWidth)][int(y/gd.TileHeight)].OffsetX = rand.Intn(gd.TileWidth)
+				xx.Tiles[int(x/gd.TileWidth)][int(y/gd.TileHeight)].OffsetY = rand.Intn(gd.TileHeight)
 			}
 		}
 	}
