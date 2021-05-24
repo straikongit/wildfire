@@ -1,0 +1,4 @@
+
+			pointX := image.Point{x * gd.TileWidth, y * gd.TileHeight}
+			pointY := image.Point{x*gd.TileWidth + gd.TileWidth, y*gd.TileHeight + gd.TileHeight}
+			subImg := si.SubImage(image.Rectangle{pointX, pointY})
