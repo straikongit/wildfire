@@ -57,7 +57,7 @@ func (m *Map) Load(filename string) image.Image {
 	return img
 
 }
-
+/*
 func (m *Map) MakeMapSubImages(img image.Image) {
 	log.Println(m.Width, m.TileWidth, m.TileHeight)
 	si, ok := (img).(SubImager)
@@ -77,6 +77,8 @@ func (m *Map) MakeMapSubImages(img image.Image) {
 		m.SubImages = append(m.SubImages, sub)
 	}
 }
+*/
+
 
 func (m *Map) MakeTileProperties(g **Game, img image.Image) {
 	//tiles := g.Tiles

@@ -52,7 +52,10 @@ func getNeighbours(Tiles [][]Tile) (c [][]Tile) {
 			s = append(s, []int{x, y - 1})
 			for _, n := range s {
 				if n[0] >= 0 && n[0] < gd.ScreenWidth && n[1] >= 0 && n[1] < gd.ScreenHeight {
-					Tiles[x][y].Neighbours = append(Tiles[x][y].Neighbours, &Tiles[n[0]][n[1]])
+					t := &Tiles[n[0]][n[1]]
+					if t.Properties["isForest"] && !t.Properties["isWater"] {
+						Tiles[x][y].Neighbours = append(Tiles[x][y].Neighbours, &Tiles[n[0]][n[1]])
+					}
 				}
 
 			}
@@ -126,15 +129,25 @@ func updateGame(g *Game) {
 			case <-quit:
 				break //loop
 			case <-time.After(time.Millisecond * config.PausePerRound):
-				//check for lightnings first
-				if rand.Intn(100) <= config.Lightnings {
-					//if rand.Intn(100) <= 30 {
-					x := rand.Intn(w)
-					y := rand.Intn(h)
+								mutex.Lock()
+				x := rand.Intn(w)
+				y := rand.Intn(h)
+				t := g.Tiles[x][y]
+				if t.Properties["isForest"] && !t.Properties["isWater"] {
+					if t.Status == empty {
+						if rand.Intn(100) <= 1 { //calcMapProb(prob) {
+							// 1% of cells trees start growing
+							img := gd.Img.Tree
+							t.SubImages[0].Image = img
+							t.Status = tree
+							g.ActiveTiles[Point{t.X, t.Y}] = &t
+							for _, n := range t.Neighbours {
+								if n.Status == empty {
+									g.ActiveTiles[Point{t.X, t.Y}] = n
+								}
 
-					t := &g.Tiles[x][y]
-					if t.Status == tree {
-						t.Status = hitByLightning
+							}
+						}
 					}
 				}
 				for x, t1 := range g.Tiles {
@@ -159,44 +172,50 @@ func updateGame(g *Game) {
 								switch count {
 								case 5, 6, 7, 8:
 									//prob = 300000
-									prob = 3500
-									//logger.Println(strconv.Itoa(x) + " Nachbarn")
+									prob = 35000
 								case 3, 4:
 									//prob = 8000
-									prob = 2800
-									//logger.Println(strconv.Itoa(x) + " Nachbarn")
+									prob = 28000
 								case 2:
 									//prob = 4000
-									prob = 1400
-									//logger.Println(strconv.Itoa(x) + " Nachbarn")
+									prob = 14000
 								case 1:
-									prob = 700
+									prob = 7000
 								}
 								if rand.Intn(100000) <= calcMapProb(prob) {
 									// 1i%% of cells trees start growing
-									//img := SubImage{t.X, t.Y, imgTree}
 									img := gd.Img.Tree
 									t.SubImages[0].Image = img
 									t.Status = tree
+									g.ActiveTiles[Point{t.X, t.Y}] = t
 								}
 							case tree:
-								var firecounter int
-								for _, n := range t.Neighbours {
-									if n.Status == fireFull {
-										//	if n.fireDuration < config.Fireduration-5 {
-										firecounter += 3
-										//	}
-									}
-									if rand.Intn(100) < firecounter {
+								//check for lightnings first
+								if rand.Intn(1000000) <= config.Lightnings {
+									//if rand.Intn(100) <= 30 {
+									/*x := rand.Intn(w)
+									y := rand.Intn(h)
 
-										t.Status = fireSmall
+									t := &g.Tiles[x][y]
+
+									*/
+									t.Status = fireSmall
+								} else {
+
+									var firecounter int
+									for _, n := range t.Neighbours {
+										if n.Status == fireFull {
+											//	if n.fireDuration < config.Fireduration-5 {
+											firecounter += 2
+											//	}
+										}
+										if rand.Intn(100) < firecounter {
+
+											t.Status = fireSmall
+										}
 									}
 								}
 
-							case hitByLightning:
-								//img := SubImage{t.X, t.Y, imgFire}
-								t.SubImages[fireSmall].Image = gd.Img.FireSmall[0]
-								t.Status = fireSmall
 							case fireSmall:
 								t.SubImages[fireSmall].Image = gd.Img.FireSmall[rand.Intn(2)]
 								rand.Intn(2)
@@ -226,12 +245,14 @@ func updateGame(g *Game) {
 									t.wastelandDuration = 0
 									t.fireDuration = 0
 									t.Status = empty
+									delete(g.ActiveTiles, Point{t.X, t.Y})
 								}
 
 							}
 						}
 					}
 				}
+								mutex.Unlock()
 			}
 		} else {
 			time.Sleep(time.Second * 1)
@@ -241,155 +262,3 @@ func updateGame(g *Game) {
 	logger.Println("Stop")
 	//logger.ende
 }
-
-/*
-	else {
-		for i, c1 := range cells {
-			for j := range c1 {
-				c := &cells[i][j]
-				var tmpcell = cell{c.x, c.y, nil, rune(' '), 5, 5, false, rune(' '), c.style.Normal(), c.style.Normal()}
-				//c := &cells[id]
-
-				switch c.Rune {
-
-				case r.wasteland:
-
-					switch {
-					case c.wastelandDuration == config.WastelandDuration-50:
-						tmpcell.Rune = r.wasteland
-						tmpcell.style = tmpcell.style.Foreground(tcell.ColorBlack)
-						toChange = append(toChange, tmpcell)
-						c.wastelandDuration -= 1
-					case c.wastelandDuration > 0:
-
-						c.wastelandDuration -= 1
-					default:
-						if rand.Intn(100) < 2 {
-							tmpcell.Rune = r.empty
-							toChange = append(toChange, tmpcell)
-						}
-					}
-
-				case r.burningTree:
-					if c.fireDuration > 0 {
-						c.fireDuration -= 1
-					} else {
-						// nothing grows for wastlandDuration
-						tmpcell.Rune = r.wasteland
-						tmpcell.wastelandDuration = config.WastelandDuration
-						tmpcell.style = tmpcell.style.Foreground(tcell.ColorFireBrick)
-						toChange = append(toChange, tmpcell)
-					}
-				case r.lightning:
-					tmpcell.Rune = c.lastRune
-					tmpcell.style = c.laststyle
-
-					for _, n := range c.Neighbours {
-
-						n.style = n.laststyle
-						toChange = append(toChange, *n)
-					}
-					if c.lastRune == r.tree {
-						if rand.Intn(100) < config.LightningStartsFire {
-
-							tmpcell.Rune = r.burningTree
-							tmpcell.style = tmpcell.style.Foreground(tcell.ColorRed)
-							tmpcell.fireDuration = config.Fireduration
-						}
-					}
-
-					toChange = append(toChange, tmpcell)
-
-				case r.tree:
-					// if a Neighbour burns, I may burn
-					var firecounter int
-					for _, n := range c.Neighbours {
-						if n.Rune == r.burningTree {
-							if n.fireDuration < config.Fireduration-5 {
-								firecounter += 3
-							}
-						}
-						if rand.Intn(100) < firecounter {
-							tmpcell.Rune = r.burningTree
-							tmpcell.fireDuration = config.Fireduration
-							tmpcell.style = tmpcell.style.Foreground(tcell.ColorRed)
-							toChange = append(toChange, tmpcell)
-
-						}
-					}
-
-				case r.empty:
-
-					prob := config.CreateNewTree
-					//prob := 400
-					var x int
-					for _, n := range c.Neighbours {
-						if n.Rune == r.tree {
-							x++
-							//prob = prob + 3000
-						}
-					}
-					switch x {
-					case 5, 6, 7, 8:
-						prob = 500000
-						//logger.Println(strconv.Itoa(x) + " Nachbarn")
-					case 3, 4:
-						prob = 12000
-						//logger.Println(strconv.Itoa(x) + " Nachbarn")
-					case 2:
-						prob = 5000
-						//logger.Println(strconv.Itoa(x) + " Nachbarn")
-					case 1:
-						prob = 1000
-					}
-					if rand.Intn(1000000) <= prob {
-						// 1i%% of cells trees start growing
-						tmpcell.Rune = r.tree
-						tmpcell.style = tmpcell.style.Foreground(tcell.ColorSpringGreen)
-						toChange = append(toChange, tmpcell)
-					}
-				}
-			}
-			//			logger.Printf("%v %p \n", &cells[1][2].Neighbours, cells[1][2].Neighbours)
-		}
-	}
-	for _, c := range toChange {
-		switch c.Rune {
-
-		case r.wasteland:
-			cells[c.x][c.y].Rune = r.wasteland
-			cells[c.x][c.y].wastelandDuration = c.wastelandDuration
-			cells[c.x][c.y].lastRune = c.lastRune
-			cells[c.x][c.y].style = c.style
-			cells[c.x][c.y].laststyle = c.laststyle
-			scn.SetContent(c.x, c.y, c.Rune, []rune(""), c.style)
-			//scn.SetContent(c.x, c.y, c.Rune, []rune(""), tcell.StyleDefault.Foreground(tcell.ColorBlack))
-		case r.burningTree:
-			cells[c.x][c.y].Rune = r.burningTree
-			cells[c.x][c.y].fireDuration = c.fireDuration
-			cells[c.x][c.y].style = c.style
-			cells[c.x][c.y].laststyle = c.laststyle
-			//scn.SetContent(c.x, c.y, c.Rune, []rune(""), tcell.StyleDefault.Foreground(tcell.ColorRed))
-			scn.SetContent(c.x, c.y, c.Rune, []rune(""), c.style)
-		case r.empty:
-			cells[c.x][c.y].Rune = r.empty
-			scn.SetContent(c.x, c.y, c.Rune, []rune(""), tcell.StyleDefault)
-		case r.lightning:
-			cells[c.x][c.y].Rune = r.lightning
-			cells[c.x][c.y].lastRune = c.lastRune
-			cells[c.x][c.y].laststyle = c.laststyle
-			//scn.SetContent(c.x, c.y, c.Rune, []rune(""), tcell.StyleDefault.Foreground(tcell.ColorYellow))
-			scn.SetContent(c.x, c.y, c.Rune, []rune(""), c.style)
-		case r.tree:
-			cells[c.x][c.y].Rune = r.tree
-			cells[c.x][c.y].style = c.style
-			cells[c.x][c.y].laststyle = c.laststyle
-			//scn.SetContent(c.x, c.y, c.Rune, []rune(""), tcell.StyleDefault.Foreground(tcell.ColorSpringGreen))
-			scn.SetContent(c.x, c.y, c.Rune, []rune(""), c.style)
-		}
-
-	}
-	scn.Show()
-
-	//time.Sleep(time.Millisecond * 50)
-*/
