@@ -15,14 +15,14 @@ type Config struct {
 }
 
 func (c *Config) init() {
-	c.FireDurationFull = 200   //15
-	c.FireDurationSmall = 15   //15
-	c.WastelandDuration = 150  //300
-	c.Lightnings = 20          //1
-	c.LightningStartsFire = 30 //10
+	c.FireDurationFull = 40   //15
+	c.FireDurationSmall = 10   //15
+	c.WastelandDuration = 35  //300
+	c.Lightnings = 2         //1
+	c.LightningStartsFire = 10 //10
 
 	//each round new trees grow with a probability of 100.000 / CreateNewTree
-	c.CreateNewTree = 2   //100              //4
+	c.CreateNewTree = 1   //100              //4
 	c.PausePerRound = 200 //50
 
 }

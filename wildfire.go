@@ -8,6 +8,7 @@ import (
 	"image"
 	_ "image/png"
 	"log"
+	"sync"
 	//	"sync"
 )
 
@@ -31,7 +32,7 @@ type GameImages struct {
 	FireFull  []*ebiten.Image
 }
 
-func (g *GameData) LoadImages() {
+func (g *GameData) LoadSubImages() {
 	g.Img = GameImages{}
 
 	g.Img.Tree, _, _ = ebitenutil.NewImageFromFile(g.TreeFileName)
@@ -48,7 +49,12 @@ func (g *GameData) LoadImages() {
 
 type Game struct {
 	Tiles [][]Tile
+	ActiveTiles map[Point]*Tile
 }
+type Point struct {
+		X int
+		Y int
+		}
 
 type Tile struct {
 	X                 int
@@ -69,17 +75,18 @@ type SubImage struct {
 	Image *ebiten.Image
 }
 
-// map64*48.png, tree8x8.png
-func (g *GameData) init() {
-	g.ScreenWidth = 8
-	g.ScreenHeight = 6
-	g.TileWidth = 8
-	g.TileHeight = 8
-	g.MapFileName = "assets/map64x48.png"
-	g.TreeFileName = "assets/tree8x8.png"
-	g.FireFileName = "assets/fire/fire.png"
-}
 
+// map.png, tree4x4.png
+func (g *GameData) init() {
+	//g := GameData{
+	g.ScreenWidth = 1024 / 2
+	g.ScreenHeight = 768 / 2
+	g.TileWidth = 2
+	g.TileHeight = 2
+	g.MapFileName = "assets/map1024x768.png"
+	g.TreeFileName = "assets/tree4x4.png"
+	g.FireFileName = "assets/fire/fire4x4.png"
+}
 /*
 // map.png, tree8x8.png
 func (g *GameData) init() {
@@ -174,23 +181,19 @@ func (g *GameData) init() {
 	//return g
 }
 */
-
-/*
-type SubImager interface {
-	SubImage(r image.Rectangle) image.Image
-}
-*/
 var TileProperties = make([][]map[string]bool, 0)
+var fireCounter int
+var mutex = &sync.Mutex{}
+var m Map
 
 func CreateTiles(g *Game) {
 	//allTiles := make([][]Tile, gd.ScreenWidth)
 
-	var m Map
 	img := m.Load(gd.MapFileName)
 
 	m.TileWidth = gd.TileWidth
 	m.TileHeight = gd.TileHeight
-	m.MakeMapSubImages(img)
+	//m.MakeMapSubImages(img)
 	g.Tiles = make([][]Tile, gd.ScreenWidth)
 	for x := range g.Tiles {
 
@@ -205,7 +208,7 @@ func CreateTiles(g *Game) {
 				SubImages:  make([]SubImage, 5),
 			}
 
-			tile.MapImage = m.SubImages[x][y]
+			//	tile.MapImage = m.SubImages[x][y]
 			tiles[y] = tile
 			//g.Tiles[x][y] = tile
 		}
@@ -218,23 +221,20 @@ func CreateTiles(g *Game) {
 	g.Tiles = getNeighbours(g.Tiles)
 }
 
-var fireCounter int
 
-//var wg sync.WaitGroup
 
 // Draw draws the game screen.
 // Draw is called every frame (typically 1/60[s] for 60Hz display).
 func (g *Game) Draw(screen *ebiten.Image) {
 	//img1, _, _ := ebitenutil.NewImageFromFile("assets/tree1.png")
-	for _,tiles := range g.Tiles {
+	//log.Println(len(g.ActiveTiles))
+	screen.DrawImage(ebiten.NewImageFromImage(m.Image), nil)
+	var op = &ebiten.DrawImageOptions{}
+	mutex.Lock()
+	for _, tile := range g.ActiveTiles {
 
-		for _,tile := range tiles {
+		//for _, tile := range tiles {
 
-			//tile := g.Tiles[x][y]
-			//p := tile.Properties
-			op := &ebiten.DrawImageOptions{}
-			op.GeoM.Translate(float64(tile.X), float64(tile.Y))
-			screen.DrawImage(tile.MapImage, op)
 			//wg.Wait()
 			for _, s := range tile.SubImages {
 				if s.Image != nil {
@@ -246,9 +246,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 				}
 			}
 
-		}
+		//}
 
 	}
+	mutex.Unlock()
 }
 
 // Layout takes the outside size (e.g., the window size) and returns the (logical) screen size.
@@ -266,10 +267,11 @@ func main() {
 	//	MapFileName = "assets/map64x48.png"
 	Printme()
 	gd.init()
-	gd.LoadImages()
+	gd.LoadSubImages()
 	g := &Game{}
 	//gd.Img = loadGameImages(&gd)
 	CreateTiles(g)
+	g.ActiveTiles = make(map[Point] *Tile)
 	ebiten.SetWindowResizable(true)
 	ebiten.SetWindowSize(400, 300)
 	//ebiten.SetWindowSize(1024, 768)
