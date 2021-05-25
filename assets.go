@@ -63,7 +63,6 @@ func (m *Map) MakeMapSubImages(img image.Image) {
 	si, ok := (img).(SubImager)
 	if !ok {
 		fmt.Println(": img does not support SubImage()")
-		//			log.Fatal(err)
 	}
 	for x := 0; x < m.Width; x = x + m.TileWidth {
 		var sub = make([]*ebiten.Image, 0) //m.Height/TileHeight)
@@ -71,7 +70,6 @@ func (m *Map) MakeMapSubImages(img image.Image) {
 
 			pointX := image.Point{x, y}
 			pointY := image.Point{x + m.TileWidth, y + m.TileHeight}
-			//fmt.Println(pointX,pointY)
 			subImg := si.SubImage(image.Rectangle{pointX, pointY})
 			i := ebiten.NewImageFromImage(subImg)
 			sub = append(sub, i)
