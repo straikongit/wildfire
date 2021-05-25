@@ -218,19 +218,19 @@ func CreateTiles(g *Game) {
 	g.Tiles = getNeighbours(g.Tiles)
 }
 
-// Draw draws the game screen.
-// Draw is called every frame (typically 1/60[s] for 60Hz display).
 var fireCounter int
 
 //var wg sync.WaitGroup
 
+// Draw draws the game screen.
+// Draw is called every frame (typically 1/60[s] for 60Hz display).
 func (g *Game) Draw(screen *ebiten.Image) {
 	//img1, _, _ := ebitenutil.NewImageFromFile("assets/tree1.png")
-	for x := range g.Tiles {
+	for _,tiles := range g.Tiles {
 
-		for y := range g.Tiles[x] {
+		for _,tile := range tiles {
 
-			tile := g.Tiles[x][y]
+			//tile := g.Tiles[x][y]
 			//p := tile.Properties
 			op := &ebiten.DrawImageOptions{}
 			op.GeoM.Translate(float64(tile.X), float64(tile.Y))
@@ -243,34 +243,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 					op.GeoM.Translate(float64(tile.X-tile.OffsetX), float64(tile.Y-tile.OffsetY))
 					screen.DrawImage(s.Image, op)
 					s.Image = nil
-					op = &ebiten.DrawImageOptions{}
-					op.GeoM.Translate(float64(tile.X-tile.OffsetX), float64(tile.Y-tile.OffsetY))
 				}
 			}
 
-			//fmt.Println(pointX,pointY)
-			/*
-				if p["isForest"] && !p["isWater"] {
-					if tile.Status == hitByLightning {
-						if x > 0 && y > 0 {
-							op = &ebiten.DrawImageOptions{}
-							op.GeoM.Translate(float64(tile.X-tile.OffsetX), float64(tile.Y-tile.OffsetY))
-							screen.DrawImage(imgTree, op)
-							op = &ebiten.DrawImageOptions{}
-							op.GeoM.Translate(float64(tile.X-tile.OffsetX), float64(tile.Y-tile.OffsetY))
-							fireCounter = rand.Intn(2)
-							if fireCounter == 1 {
-								//screen.DrawImage(imgFire.SubImage(image.Rect(8, 0, 16, 8)).(*ebiten.Image), op)
-								screen.DrawImage(imgFire.SubImage(image.Rect(fireCounter*gd.TileWidth, 0, fireCounter+gd.TileWidth+gd.TileWidth, gd.TileHeight)).(*ebiten.Image), op)
-							} else {
-
-								//screen.DrawImage(imgFire.SubImage(image.Rect(0, 0, 8, 8)).(*ebiten.Image), op)
-								screen.DrawImage(imgFire.SubImage(image.Rect(0, 0, gd.TileWidth, gd.TileHeight)).(*ebiten.Image), op)
-							}
-						}
-					}
-				}
-			*/
 		}
 
 	}
