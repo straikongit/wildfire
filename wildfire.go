@@ -3,14 +3,15 @@ package main
 import (
 	//	"farni.com/assets"
 	//	"fmt"
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"image"
 	_ "image/png"
 	"log"
 	"math/rand"
 	"sync"
 	"time"
+
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	//	"sync"
 )
 
@@ -50,13 +51,13 @@ func (g *GameData) LoadSubImages() {
 }
 
 type Game struct {
-	Tiles [][]Tile
+	Tiles       [][]Tile
 	ActiveTiles map[Point]*Tile
 }
 type Point struct {
-		X int
-		Y int
-		}
+	X int
+	Y int
+}
 
 type Tile struct {
 	X                 int
@@ -77,7 +78,6 @@ type SubImage struct {
 	Image *ebiten.Image
 }
 
-
 // map.png, tree4x4.png
 func (g *GameData) init() {
 	//g := GameData{
@@ -89,6 +89,7 @@ func (g *GameData) init() {
 	g.TreeFileName = "assets/tree4x4.png"
 	g.FireFileName = "assets/fire/fire4x4.png"
 }
+
 /*
 // map.png, tree8x8.png
 func (g *GameData) init() {
@@ -190,9 +191,9 @@ var m Map
 
 func CreateTiles(g *Game) {
 	//allTiles := make([][]Tile, gd.ScreenWidth)
-	 rand.Seed(time.Now().Unix())
+	rand.Seed(time.Now().Unix())
 
-	img := m.Load(gd.MapFileName)
+	m.Load(gd.MapFileName)
 
 	m.TileWidth = gd.TileWidth
 	m.TileHeight = gd.TileHeight
@@ -203,16 +204,16 @@ func CreateTiles(g *Game) {
 		tiles := make([]Tile, gd.ScreenHeight)
 		for y := range tiles {
 			tile := Tile{
-				X:      x * gd.TileWidth,
-				Y:      y * gd.TileHeight,
+				X:       x * gd.TileWidth,
+				Y:       y * gd.TileHeight,
 				OffsetX: rand.Intn(gd.TileWidth),
 				OffsetY: rand.Intn(gd.TileHeight),
-				Status: empty,
+				Status:  empty,
 				//Properties: make( Properties[string]bool{},0),
 				//Properties: make(map[string]bool),
-				SubImages:  make([]SubImage, 5),
+				SubImages: make([]SubImage, 5),
 			}
-			tile.Properties= m.GetProperties(tile,img)
+			tile.Properties = m.GetProperties(tile)
 
 			//	tile.MapImage = m.SubImages[x][y]
 			tiles[y] = tile
@@ -227,8 +228,6 @@ func CreateTiles(g *Game) {
 	g.Tiles = getNeighbours(g.Tiles)
 }
 
-
-
 // Draw draws the game screen.
 // Draw is called every frame (typically 1/60[s] for 60Hz display).
 func (g *Game) Draw(screen *ebiten.Image) {
@@ -241,16 +240,16 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 		//for _, tile := range tiles {
 
-			//wg.Wait()
-			for _, s := range tile.SubImages {
-				if s.Image != nil {
+		//wg.Wait()
+		for _, s := range tile.SubImages {
+			if s.Image != nil {
 
-					op = &ebiten.DrawImageOptions{}
-					op.GeoM.Translate(float64(tile.X-tile.OffsetX), float64(tile.Y-tile.OffsetY))
-					screen.DrawImage(s.Image, op)
-					s.Image = nil
-				}
+				op = &ebiten.DrawImageOptions{}
+				op.GeoM.Translate(float64(tile.X-tile.OffsetX), float64(tile.Y-tile.OffsetY))
+				screen.DrawImage(s.Image, op)
+				s.Image = nil
 			}
+		}
 
 		//}
 
@@ -274,7 +273,7 @@ func main() {
 	gd.LoadSubImages()
 	g := &Game{}
 	CreateTiles(g)
-	g.ActiveTiles = make(map[Point] *Tile)
+	g.ActiveTiles = make(map[Point]*Tile)
 	ebiten.SetWindowResizable(true)
 	ebiten.SetWindowSize(400, 300)
 	//ebiten.SetWindowSize(1024, 768)
