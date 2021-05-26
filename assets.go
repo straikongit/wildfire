@@ -80,6 +80,36 @@ func (m *Map) MakeMapSubImages(img image.Image) {
 */
 
 
+func (m *Map) GetProperties( t Tile, img image.Image) (map[string]bool){
+
+	p:= make(map[string]bool)
+	//si, _ := (*img).(SubImager)
+	//pointX := image.Point{t.X, t.Y}
+	//pointY := image.Point{t.X + m.TileWidth, t.Y + m.TileHeight}
+	//fmt.Println(pointX,pointY)
+	//subImg := si.SubImage(image.Rectangle{pointX, pointY})
+	for x := t.X; x < t.X + gd.TileWidth; x++ {
+		for y := t.Y; y < t.Y + gd.TileHeight; y++ {
+			//pixel := img.At(x, y)
+			//c := color.RGBAModel.Convert(pixel).(color.RGBA)
+			r, g, b, _ := img.At(x, y).RGBA()
+			//log.Println(r, g, b, a)
+			if b > g && b > r {
+				p["isWater"] = true
+
+			}else if g > r && g > b {
+				p["isForest"] = true
+				t.OffsetX = rand.Intn(gd.TileWidth)
+				t.OffsetY = rand.Intn(gd.TileHeight)
+			}
+		}
+	}
+	return p
+
+
+
+
+}
 func (m *Map) MakeTileProperties(g **Game, img image.Image) {
 	//tiles := g.Tiles
 	rand.Seed(time.Now().Unix())

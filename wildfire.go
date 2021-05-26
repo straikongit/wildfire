@@ -8,7 +8,9 @@ import (
 	"image"
 	_ "image/png"
 	"log"
+	"math/rand"
 	"sync"
+	"time"
 	//	"sync"
 )
 
@@ -188,6 +190,7 @@ var m Map
 
 func CreateTiles(g *Game) {
 	//allTiles := make([][]Tile, gd.ScreenWidth)
+	 rand.Seed(time.Now().Unix())
 
 	img := m.Load(gd.MapFileName)
 
@@ -202,11 +205,14 @@ func CreateTiles(g *Game) {
 			tile := Tile{
 				X:      x * gd.TileWidth,
 				Y:      y * gd.TileHeight,
+				OffsetX: rand.Intn(gd.TileWidth),
+				OffsetY: rand.Intn(gd.TileHeight),
 				Status: empty,
 				//Properties: make( Properties[string]bool{},0),
-				Properties: make(map[string]bool),
+				//Properties: make(map[string]bool),
 				SubImages:  make([]SubImage, 5),
 			}
+			tile.Properties= m.GetProperties(tile,img)
 
 			//	tile.MapImage = m.SubImages[x][y]
 			tiles[y] = tile
@@ -216,7 +222,7 @@ func CreateTiles(g *Game) {
 		g.Tiles[x] = tiles
 	}
 
-	m.MakeTileProperties(&g, img)
+	//m.MakeTileProperties(&g, img)
 	//return allTiles
 	g.Tiles = getNeighbours(g.Tiles)
 }
@@ -263,19 +269,15 @@ func (g *Game) Update() error {
 	return nil
 }
 func main() {
-	//MapFileName = "assets/map1024x768.png"
-	//	MapFileName = "assets/map64x48.png"
 	Printme()
 	gd.init()
 	gd.LoadSubImages()
 	g := &Game{}
-	//gd.Img = loadGameImages(&gd)
 	CreateTiles(g)
 	g.ActiveTiles = make(map[Point] *Tile)
 	ebiten.SetWindowResizable(true)
 	ebiten.SetWindowSize(400, 300)
 	//ebiten.SetWindowSize(1024, 768)
-	//ebiten.SetWindowSize(4, 4)
 	ebiten.SetWindowTitle("Wildfire")
 	go updateGame(g)
 	if err := ebiten.RunGame(g); err != nil {

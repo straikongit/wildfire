@@ -1,1 +1,2 @@
 getNeighbours better with pointer for [][]Tile ?
+MakeProperties better with pointer for Tile and img ?
