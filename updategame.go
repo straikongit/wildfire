@@ -91,8 +91,8 @@ func updateGame(g *Game) {
 	//logger.ende
 
 	var config Config
-	config.init()
-
+	//config.init()
+	config = *LoadConfig("1024x768")
 	quit := make(chan struct{})
 	/*
 				go func() {
@@ -129,13 +129,13 @@ func updateGame(g *Game) {
 			case <-quit:
 				break //loop
 			case <-time.After(time.Millisecond * config.PausePerRound):
-								mutex.Lock()
+				mutex.Lock()
 				x := rand.Intn(w)
 				y := rand.Intn(h)
 				t := g.Tiles[x][y]
 				if t.Properties["isForest"] && !t.Properties["isWater"] {
 					if t.Status == empty {
-						if rand.Intn(100) <= 1 { //calcMapProb(prob) {
+						if rand.Intn(100) <= config.CreateNewTree { //calcMapProb(prob) {
 							// 1% of cells trees start growing
 							img := gd.Img.Tree
 							t.SubImages[0].Image = img
@@ -225,6 +225,8 @@ func updateGame(g *Game) {
 								}
 							case fireFull:
 
+								t.SubImages[0].Image = nil
+								t.SubImages[fireSmall].Image = nil
 								t.SubImages[fireFull].Image = gd.Img.FireFull[rand.Intn(2)]
 								t.fireDuration++
 								if t.fireDuration > config.FireDurationFull {
@@ -252,7 +254,7 @@ func updateGame(g *Game) {
 						}
 					}
 				}
-								mutex.Unlock()
+				mutex.Unlock()
 			}
 		} else {
 			time.Sleep(time.Second * 1)
