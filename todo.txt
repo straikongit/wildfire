@@ -6,6 +6,7 @@ display performance values (tps, fps, trees, burning trees)
 
 make fire8x8 and 4x4
 
+changed in master
 
 enable different maps on startup
 
