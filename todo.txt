@@ -5,5 +5,9 @@ degrade colours when statuws is wasteland
 make fire8x8 and 4x4
 enable different maps on startup
 
+
+
+
+
 getNeighbours better with pointer for [][]Tile ?
 MakeProperties better with pointer for Tile and img ?
