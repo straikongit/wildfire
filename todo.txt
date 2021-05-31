@@ -1,7 +1,7 @@
 
+display performance values (tps, fps, trees, burning trees)
 degrade colours when statuws is wasteland
 
-display performance values (tps, fps, trees, burning trees)
 
 
 make fire8x8 and 4x4
