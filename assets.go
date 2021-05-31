@@ -26,6 +26,7 @@ func Printme() {
 }
 
 type Map struct {
+	OrgImage   image.Image
 	Image      *ebiten.Image
 	SubImages  [][]*ebiten.Image
 	Width      int
@@ -38,7 +39,7 @@ type SubImager interface {
 	SubImage(r image.Rectangle) image.Image
 }
 
-func (m *Map) Load(filename string) image.Image {
+func (m *Map) Load(filename string) {
 	f, err := os.Open(filename)
 	defer f.Close()
 	if err != nil {
@@ -50,36 +51,40 @@ func (m *Map) Load(filename string) image.Image {
 	if err != nil {
 		log.Fatal(err)
 	}
-	ebitImage := ebiten.NewImageFromImage(img)
-	m.Image = ebitImage
 	bounds := img.Bounds()
+	m.OrgImage = img
+	m.Image = ebiten.NewImageFromImage(img)
 	m.Width, m.Height = bounds.Max.X, bounds.Max.Y
-	return img
 
 }
-/*
-func (m *Map) MakeMapSubImages(img image.Image) {
-	log.Println(m.Width, m.TileWidth, m.TileHeight)
-	si, ok := (img).(SubImager)
-	if !ok {
-		fmt.Println(": img does not support SubImage()")
-	}
-	for x := 0; x < m.Width; x = x + m.TileWidth {
-		var sub = make([]*ebiten.Image, 0) //m.Height/TileHeight)
-		for y := 0; y < m.Height; y = y + m.TileHeight {
 
-			pointX := image.Point{x, y}
-			pointY := image.Point{x + m.TileWidth, y + m.TileHeight}
-			subImg := si.SubImage(image.Rectangle{pointX, pointY})
-			i := ebiten.NewImageFromImage(subImg)
-			sub = append(sub, i)
+func (m *Map) GetProperties(t Tile) map[string]bool {
+
+	p := make(map[string]bool)
+	//si, _ := (*img).(SubImager)
+	//pointX := image.Point{t.X, t.Y}
+	//pointY := image.Point{t.X + m.TileWidth, t.Y + m.TileHeight}
+	//fmt.Println(pointX,pointY)
+	//subImg := si.SubImage(image.Rectangle{pointX, pointY})
+	for x := t.X; x < t.X+gd.TileWidth; x++ {
+		for y := t.Y; y < t.Y+gd.TileHeight; y++ {
+			//pixel := img.At(x, y)
+			//c := color.RGBAModel.Convert(pixel).(color.RGBA)
+			r, g, b, _ := m.OrgImage.At(x, y).RGBA()
+			//log.Println(r, g, b, a)
+			if b > g && b > r {
+				p["isWater"] = true
+
+			} else if g > r && g > b {
+				p["isForest"] = true
+				t.OffsetX = rand.Intn(gd.TileWidth)
+				t.OffsetY = rand.Intn(gd.TileHeight)
+			}
 		}
-		m.SubImages = append(m.SubImages, sub)
 	}
+	return p
+
 }
-*/
-
-
 func (m *Map) MakeTileProperties(g **Game, img image.Image) {
 	//tiles := g.Tiles
 	rand.Seed(time.Now().Unix())

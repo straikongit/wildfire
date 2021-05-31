@@ -74,14 +74,14 @@ Kleinere Karten brauchen größere Wahrscheinlichkeiten
 Klappt so Mittel
 */
 func calcMapProb(prob int) int {
-	p := 1024 / gd.ScreenWidth / 2 * prob
+	p := gd.ScreenHeight * gd.ScreenWidth
 	return int(p)
 
 }
 
 func updateGame(g *Game) {
 	// logger
-	f, err := os.OpenFile("/home/far/daten/dev/go/src/farhome/wildfire/fire.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+	f, err := os.OpenFile("./.logs/fire.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		log.Println(err)
 	}
@@ -91,8 +91,9 @@ func updateGame(g *Game) {
 	//logger.ende
 
 	var config Config
-	config.init()
-
+	//config.init()
+	config = *LoadConfig("1024x768")
+	timer1 := time.NewTicker(2 * time.Second)
 	quit := make(chan struct{})
 	/*
 				go func() {
@@ -128,15 +129,21 @@ func updateGame(g *Game) {
 			select {
 			case <-quit:
 				break //loop
+			case <-timer1.C:
+				config = *LoadConfig("1024x768")
+			case <-time.After(2 * time.Second):
+				config = *LoadConfig("1024x768")
+				log.Println("LoadConfig")
 			case <-time.After(time.Millisecond * config.PausePerRound):
-								mutex.Lock()
+				mutex.Lock()
 				x := rand.Intn(w)
 				y := rand.Intn(h)
 				t := g.Tiles[x][y]
 				if t.Properties["isForest"] && !t.Properties["isWater"] {
 					if t.Status == empty {
-						if rand.Intn(100) <= 1 { //calcMapProb(prob) {
+						if rand.Intn(w*h) <= config.CreateNewTree { //calcMapProb(prob) {
 							// 1% of cells trees start growing
+							log.Println("new Tree at " + string(x) + ", " + string(y))
 							img := gd.Img.Tree
 							t.SubImages[0].Image = img
 							t.Status = tree
@@ -172,17 +179,17 @@ func updateGame(g *Game) {
 								switch count {
 								case 5, 6, 7, 8:
 									//prob = 300000
-									prob = 35000
+									prob = config.CreateNewTree * 5000
 								case 3, 4:
 									//prob = 8000
-									prob = 28000
+									prob = config.CreateNewTree * 3500
 								case 2:
 									//prob = 4000
-									prob = 14000
+									prob = config.CreateNewTree * 2000
 								case 1:
-									prob = 7000
+									prob = config.CreateNewTree * 1000
 								}
-								if rand.Intn(100000) <= calcMapProb(prob) {
+								if rand.Intn(w*h * 10) <= prob {
 									// 1i%% of cells trees start growing
 									img := gd.Img.Tree
 									t.SubImages[0].Image = img
@@ -191,7 +198,7 @@ func updateGame(g *Game) {
 								}
 							case tree:
 								//check for lightnings first
-								if rand.Intn(1000000) <= config.Lightnings {
+								if rand.Intn(w*h*1000) <= config.Lightnings {
 									//if rand.Intn(100) <= 30 {
 									/*x := rand.Intn(w)
 									y := rand.Intn(h)
@@ -206,7 +213,7 @@ func updateGame(g *Game) {
 									for _, n := range t.Neighbours {
 										if n.Status == fireFull {
 											//	if n.fireDuration < config.Fireduration-5 {
-											firecounter += 2
+											firecounter +=10
 											//	}
 										}
 										if rand.Intn(100) < firecounter {
@@ -225,6 +232,8 @@ func updateGame(g *Game) {
 								}
 							case fireFull:
 
+								t.SubImages[0].Image = nil
+								t.SubImages[fireSmall].Image = nil
 								t.SubImages[fireFull].Image = gd.Img.FireFull[rand.Intn(2)]
 								t.fireDuration++
 								if t.fireDuration > config.FireDurationFull {
@@ -252,7 +261,7 @@ func updateGame(g *Game) {
 						}
 					}
 				}
-								mutex.Unlock()
+				mutex.Unlock()
 			}
 		} else {
 			time.Sleep(time.Second * 1)
