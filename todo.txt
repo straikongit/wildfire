@@ -7,7 +7,13 @@ enable different maps on startup
 
 
 
+
 chagned in dev
+
+changed in main
+
+and again
+
 
 getNeighbours better with pointer for [][]Tile ?
 MakeProperties better with pointer for Tile and img ?
