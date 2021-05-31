@@ -9,6 +9,7 @@ enable different maps on startup
 
 changed in master
 
+and again
 
 getNeighbours better with pointer for [][]Tile ?
 MakeProperties better with pointer for Tile and img ?
