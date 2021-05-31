@@ -1,15 +1,14 @@
 package main
 
 import (
-	"time"
 	"encoding/json"
 	"io/ioutil"
+	"time"
 )
 
-
 type Configs struct {
-	        Configs map[string]*Config
-	}
+	Configs map[string]*Config
+}
 
 type Config struct {
 	FireDurationFull    int

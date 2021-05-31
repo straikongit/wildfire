@@ -1,1 +1,22 @@
-{"Configs":{"fast":{"FireDurationFull":80,"FireDurationSmall":5,"WastelandDuration":35,"Lightnings":1,"LightningStartsFire":1,"CreateNewTree":10,"PausePerRound":400},"slow":{"FireDurationFull":20,"FireDurationSmall":5,"WastelandDuration":35,"Lightnings":1,"LightningStartsFire":1,"CreateNewTree":10,"PausePerRound":400}}}
+{
+    "Configs": {
+        "1024x768": {
+            "FireDurationFull": 100,
+            "FireDurationSmall": 2,
+            "WastelandDuration": 50,
+            "Lightnings": 30,
+            "LightningStartsFire": 1,
+            "CreateNewTree": 4,
+            "PausePerRound": 1
+        },
+        "slow": {
+            "FireDurationFull": 20,
+            "FireDurationSmall": 5,
+            "WastelandDuration": 35,
+            "Lightnings": 1000,
+            "LightningStartsFire": 10,
+            "CreateNewTree": 10,
+            "PausePerRound": 400
+        }
+    }
+}

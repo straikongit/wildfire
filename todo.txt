@@ -1,6 +1,11 @@
-Make fire nice
-round edges on fire 8xx
+
+degrade colours when statuws is wasteland
+
+display performance values (tps, fps, trees, burning trees)
+
+
 make fire8x8 and 4x4
+
 
 enable different maps on startup
 

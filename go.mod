@@ -1,8 +1,8 @@
-module farhome/wildfire/wildfireopengl
+module wildfire
 
 go 1.13
 
-replace farni.com/assets => ../wildfireopengl
+replace farni.com/assets => ../wildfire
 
 require (
 	github.com/gdamore/tcell v1.4.0
