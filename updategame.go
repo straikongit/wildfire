@@ -189,7 +189,7 @@ func updateGame(g *Game) {
 								case 1:
 									prob = config.CreateNewTree * 1000
 								}
-								if rand.Intn(w*h * 10) <= prob {
+								if rand.Intn(w*h*10) <= prob {
 									// 1i%% of cells trees start growing
 									img := gd.Img.Tree
 									t.SubImages[0].Image = img
@@ -213,7 +213,7 @@ func updateGame(g *Game) {
 									for _, n := range t.Neighbours {
 										if n.Status == fireFull {
 											//	if n.fireDuration < config.Fireduration-5 {
-											firecounter +=10
+											firecounter += 10
 											//	}
 										}
 										if rand.Intn(100) < firecounter {
