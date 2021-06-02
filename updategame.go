@@ -70,17 +70,6 @@ var pause bool
 
 var showDebugInfo bool
 
-/*
-Wahrscheinlichkeiten sind auf Screen 1024*768 ausgelegt.
-Kleinere Karten brauchen größere Wahrscheinlichkeiten
-Klappt so Mittel
-func calcMapProb(prob int) int {
-	p := gd.ScreenHeight * gd.ScreenWidth
-	return int(p)
-
-}
-
-*/
 func updateGame(g *Game) {
 
 	if ebiten.IsKeyPressed(ebiten.KeySpace) || leftTouched() {
