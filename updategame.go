@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/gdamore/tcell"
-
+	"github.com/hajimehoshi/ebiten/v2"
 	//"strconv"
 	//"config"
 	"time"
@@ -68,18 +68,26 @@ func getNeighbours(Tiles [][]Tile) (c [][]Tile) {
 var Width, Height int
 var pause bool
 
+var showDebugInfo bool
+
 /*
 Wahrscheinlichkeiten sind auf Screen 1024*768 ausgelegt.
 Kleinere Karten brauchen größere Wahrscheinlichkeiten
 Klappt so Mittel
-*/
 func calcMapProb(prob int) int {
 	p := gd.ScreenHeight * gd.ScreenWidth
 	return int(p)
 
 }
 
+*/
 func updateGame(g *Game) {
+
+	if ebiten.IsKeyPressed(ebiten.KeySpace) || leftTouched() {
+		log.Println("space")
+		pause = !pause
+	}
+
 	// logger
 	f, err := os.OpenFile("./.logs/fire.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
