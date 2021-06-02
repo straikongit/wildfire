@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/gdamore/tcell"
-
+	"github.com/hajimehoshi/ebiten/v2"
 	//"strconv"
 	//"config"
 	"time"
@@ -68,18 +68,15 @@ func getNeighbours(Tiles [][]Tile) (c [][]Tile) {
 var Width, Height int
 var pause bool
 
-/*
-Wahrscheinlichkeiten sind auf Screen 1024*768 ausgelegt.
-Kleinere Karten brauchen größere Wahrscheinlichkeiten
-Klappt so Mittel
-*/
-func calcMapProb(prob int) int {
-	p := gd.ScreenHeight * gd.ScreenWidth
-	return int(p)
-
-}
+var showDebugInfo bool
 
 func updateGame(g *Game) {
+
+	if ebiten.IsKeyPressed(ebiten.KeySpace) || leftTouched() {
+		log.Println("space")
+		pause = !pause
+	}
+
 	// logger
 	f, err := os.OpenFile("./.logs/fire.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
@@ -189,7 +186,7 @@ func updateGame(g *Game) {
 								case 1:
 									prob = config.CreateNewTree * 1000
 								}
-								if rand.Intn(w*h * 10) <= prob {
+								if rand.Intn(w*h*10) <= prob {
 									// 1i%% of cells trees start growing
 									img := gd.Img.Tree
 									t.SubImages[0].Image = img
@@ -213,7 +210,7 @@ func updateGame(g *Game) {
 									for _, n := range t.Neighbours {
 										if n.Status == fireFull {
 											//	if n.fireDuration < config.Fireduration-5 {
-											firecounter +=10
+											firecounter += 10
 											//	}
 										}
 										if rand.Intn(100) < firecounter {

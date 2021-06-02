@@ -2,7 +2,7 @@ package main
 
 import (
 	//	"farni.com/assets"
-	//	"fmt"
+	"fmt"
 	"image"
 	_ "image/png"
 	"log"
@@ -208,6 +208,26 @@ func CreateTiles(g *Game) {
 	g.Tiles = getNeighbours(g.Tiles)
 }
 
+func leftTouched() bool {
+	for _, id := range ebiten.TouchIDs() {
+		x, _ := ebiten.TouchPosition(id)
+		if x < gd.ScreenWidth/2 {
+			return true
+		}
+	}
+	return false
+}
+
+/*
+func (g *Game) Update(screen *ebiten.Image) error {
+	if ebiten.IsKeyPressed(ebiten.KeyLeft) || leftTouched() {
+		log.Println("left")
+	}
+
+	return nil
+}
+*/
+
 // Draw draws the game screen.
 // Draw is called every frame (typically 1/60[s] for 60Hz display).
 func (g *Game) Draw(screen *ebiten.Image) {
@@ -235,6 +255,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	}
 	mutex.Unlock()
+	if showDebugInfo {
+		msg := fmt.Sprintf(`TPS: %0.2f
+	FPS: %0.2f
+	Num of tiles: %d
+	Press Space to pause game`, ebiten.CurrentTPS(), ebiten.CurrentFPS(), len(g.ActiveTiles))
+		ebitenutil.DebugPrint(screen, msg)
+	}
 }
 
 // Layout takes the outside size (e.g., the window size) and returns the (logical) screen size.
@@ -244,7 +271,13 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func (g *Game) Update() error {
-	// Write your game's logical update.
+	if ebiten.IsKeyPressed(ebiten.KeySpace) || leftTouched() {
+		pause = !pause
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyI) || leftTouched() {
+		showDebugInfo = !showDebugInfo
+	}
+
 	return nil
 }
 func main() {
