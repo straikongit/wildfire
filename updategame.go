@@ -72,11 +72,6 @@ var showDebugInfo bool
 
 func updateGame(g *Game) {
 
-	if ebiten.IsKeyPressed(ebiten.KeySpace) || leftTouched() {
-		log.Println("space")
-		pause = !pause
-	}
-
 	// logger
 	f, err := os.OpenFile("./.logs/fire.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
