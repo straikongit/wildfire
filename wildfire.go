@@ -256,10 +256,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 	mutex.Unlock()
 	if showDebugInfo {
-		msg := fmt.Sprintf(`TPS: %0.2f
+		msg := fmt.Sprintf(
+			`TPS: %0.2f
 	FPS: %0.2f
 	Num of tiles: %d
-	Press Space to pause game`, ebiten.CurrentTPS(), ebiten.CurrentFPS(), len(g.ActiveTiles))
+	Press Space to pause game`,
+			ebiten.CurrentTPS(),
+			ebiten.CurrentFPS(),
+			len(g.ActiveTiles))
 		ebitenutil.DebugPrint(screen, msg)
 	}
 }
