@@ -5,13 +5,14 @@ import (
 	"math/rand"
 	"os"
 
-	"github.com/gdamore/tcell"
-	"github.com/hajimehoshi/ebiten/v2"
+	//	"github.com/gdamore/tcell"
+	//	"github.com/hajimehoshi/ebiten/v2"
 	//"strconv"
 	//"config"
 	"time"
 )
 
+/*
 type cell struct {
 	x                 int
 	y                 int
@@ -24,6 +25,7 @@ type cell struct {
 	style             tcell.Style
 	laststyle         tcell.Style
 }
+*/
 type status int
 
 const (
@@ -171,10 +173,10 @@ func updateGame(g *Game) {
 								switch count {
 								case 5, 6, 7, 8:
 									//prob = 300000
-									prob = config.CreateNewTree * 5000
+									prob = config.CreateNewTree * 7000
 								case 3, 4:
 									//prob = 8000
-									prob = config.CreateNewTree * 3500
+									prob = config.CreateNewTree * 5500
 								case 2:
 									//prob = 4000
 									prob = config.CreateNewTree * 2000
@@ -190,28 +192,30 @@ func updateGame(g *Game) {
 								}
 							case tree:
 								//check for lightnings first
+								var prob int
 								if rand.Intn(w*h*1000) <= config.Lightnings {
-									//if rand.Intn(100) <= 30 {
-									/*x := rand.Intn(w)
-									y := rand.Intn(h)
-
-									t := &g.Tiles[x][y]
-
-									*/
 									t.Status = fireSmall
 								} else {
 
-									var firecounter int
+									var firecount int
 									for _, n := range t.Neighbours {
 										if n.Status == fireFull {
-											//	if n.fireDuration < config.Fireduration-5 {
-											firecounter += 10
-											//	}
+											firecount += 1
 										}
-										if rand.Intn(100) < firecounter {
+									}
+									switch firecount {
+									case 5, 6, 7, 8:
+										prob = 75
+									case 3, 4:
+										prob = 45
+									case 2:
+										prob = 8
+									case 1:
+										prob = 5
+									}
+									if rand.Intn(100) < prob {
 
-											t.Status = fireSmall
-										}
+										t.Status = fireSmall
 									}
 								}
 
