@@ -256,10 +256,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 	mutex.Unlock()
 	if showDebugInfo {
-		msg := fmt.Sprintf(`TPS: %0.2f
+		msg := fmt.Sprintf(
+			`TPS: %0.2f
 	FPS: %0.2f
 	Num of tiles: %d
-	Press Space to pause game`, ebiten.CurrentTPS(), ebiten.CurrentFPS(), len(g.ActiveTiles))
+	Press Space to pause game`,
+			ebiten.CurrentTPS(),
+			ebiten.CurrentFPS(),
+			len(g.ActiveTiles))
 		ebitenutil.DebugPrint(screen, msg)
 	}
 }
@@ -270,15 +274,25 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return gd.TileWidth * gd.ScreenWidth, gd.TileHeight * gd.ScreenHeight
 }
 
-func (g *Game) Update() error {
-	if ebiten.IsKeyPressed(ebiten.KeySpace) || leftTouched() {
-		pause = !pause
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyI) || leftTouched() {
-		showDebugInfo = !showDebugInfo
-	}
+var lastKeyPressed time.Time
 
-	return nil
+func (g *Game) Update() error {
+	//avoid sending Key multiple times
+	d := time.Since(lastKeyPressed)
+	if d.Seconds() > 1 {
+
+		if ebiten.IsKeyPressed(ebiten.KeySpace) || leftTouched() {
+			pause = !pause
+			lastKeyPressed = time.Now()
+		}
+		if ebiten.IsKeyPressed(ebiten.KeyI) || leftTouched() {
+			showDebugInfo = !showDebugInfo
+			lastKeyPressed = time.Now()
+		}
+
+	}
+		return nil
+
 }
 func main() {
 	Printme()
@@ -291,6 +305,7 @@ func main() {
 	ebiten.SetWindowSize(400, 300)
 	//ebiten.SetWindowSize(1024, 768)
 	ebiten.SetWindowTitle("Wildfire")
+			lastKeyPressed = time.Now()
 	go updateGame(g)
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)

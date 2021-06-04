@@ -5,13 +5,14 @@ import (
 	"math/rand"
 	"os"
 
-	"github.com/gdamore/tcell"
-	"github.com/hajimehoshi/ebiten/v2"
+	//	"github.com/gdamore/tcell"
+	//	"github.com/hajimehoshi/ebiten/v2"
 	//"strconv"
 	//"config"
 	"time"
 )
 
+/*
 type cell struct {
 	x                 int
 	y                 int
@@ -24,6 +25,7 @@ type cell struct {
 	style             tcell.Style
 	laststyle         tcell.Style
 }
+*/
 type status int
 
 const (
@@ -71,11 +73,6 @@ var pause bool
 var showDebugInfo bool
 
 func updateGame(g *Game) {
-
-	if ebiten.IsKeyPressed(ebiten.KeySpace) || leftTouched() {
-		log.Println("space")
-		pause = !pause
-	}
 
 	// logger
 	f, err := os.OpenFile("./.logs/fire.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
@@ -128,9 +125,6 @@ func updateGame(g *Game) {
 				break //loop
 			case <-timer1.C:
 				config = *LoadConfig("1024x768")
-			case <-time.After(2 * time.Second):
-				config = *LoadConfig("1024x768")
-				log.Println("LoadConfig")
 			case <-time.After(time.Millisecond * config.PausePerRound):
 				mutex.Lock()
 				x := rand.Intn(w)
@@ -175,45 +169,46 @@ func updateGame(g *Game) {
 								}
 								switch count {
 								case 5, 6, 7, 8:
-									//prob = 300000
-									prob = config.CreateNewTree * 5000
+									prob = config.CreateNewTree * 7000
 								case 3, 4:
-									//prob = 8000
-									prob = config.CreateNewTree * 3500
+									prob = config.CreateNewTree * 5500
 								case 2:
-									//prob = 4000
 									prob = config.CreateNewTree * 2000
 								case 1:
 									prob = config.CreateNewTree * 1000
 								}
 								if rand.Intn(w*h*10) <= prob {
-									// 1i%% of cells trees start growing
-									img := gd.Img.Tree
-									t.SubImages[0].Image = img
+									t.SubImages[0].Image = gd.Img.Tree
 									t.Status = tree
 									g.ActiveTiles[Point{t.X, t.Y}] = t
 								}
 							case tree:
 								//check for lightnings first
+								var prob int
 								if rand.Intn(w*h*1000) <= config.Lightnings {
-									//if rand.Intn(100) <= 30 {
-									/*x := rand.Intn(w)
-									y := rand.Intn(h)
-
-									t := &g.Tiles[x][y]
-
-									*/
 									t.Status = fireSmall
 								} else {
 
-									var firecounter int
+									var firecount int
 									for _, n := range t.Neighbours {
 										if n.Status == fireFull {
-											//	if n.fireDuration < config.Fireduration-5 {
-											firecounter += 10
-											//	}
+											firecount += 1
 										}
-										if rand.Intn(100) < firecounter {
+									}
+									if firecount > 0 {
+										switch firecount {
+										case 5, 6, 7, 8:
+											prob = 30
+										case 4:
+											prob = 20
+										case 3:
+											prob = 10
+										case 2:
+											prob = 10
+										case 1:
+											prob = 1
+										}
+										if rand.Intn(1000) <= config.FireJumps/100*prob {
 
 											t.Status = fireSmall
 										}
