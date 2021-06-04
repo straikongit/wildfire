@@ -7,6 +7,7 @@
             "Lightnings": 10,
             "LightningStartsFire": 1,
             "CreateNewTree": 4,
+            "FireJumps": 5000,
             "PausePerRound": 1
         },
         "slow": {

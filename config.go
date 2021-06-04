@@ -19,6 +19,7 @@ type Config struct {
 
 	//each round new trees grow with a probability of 100.000 / CreateNewTree
 	CreateNewTree int
+	FireJumps     int
 	PausePerRound time.Duration
 }
 
@@ -30,7 +31,8 @@ func (c *Config) init() {
 	c.LightningStartsFire = 1 //10
 
 	//each round new trees grow with a probability of 100.000 / CreateNewTree
-	c.CreateNewTree = 10  //100              //4
+	c.CreateNewTree = 10 //100              //4
+	c.FireJumps = 20
 	c.PausePerRound = 400 //50
 
 }

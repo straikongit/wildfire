@@ -125,9 +125,6 @@ func updateGame(g *Game) {
 				break //loop
 			case <-timer1.C:
 				config = *LoadConfig("1024x768")
-			case <-time.After(2 * time.Second):
-				config = *LoadConfig("1024x768")
-				log.Println("LoadConfig")
 			case <-time.After(time.Millisecond * config.PausePerRound):
 				mutex.Lock()
 				x := rand.Intn(w)
@@ -172,21 +169,16 @@ func updateGame(g *Game) {
 								}
 								switch count {
 								case 5, 6, 7, 8:
-									//prob = 300000
 									prob = config.CreateNewTree * 7000
 								case 3, 4:
-									//prob = 8000
 									prob = config.CreateNewTree * 5500
 								case 2:
-									//prob = 4000
 									prob = config.CreateNewTree * 2000
 								case 1:
 									prob = config.CreateNewTree * 1000
 								}
 								if rand.Intn(w*h*10) <= prob {
-									// 1i%% of cells trees start growing
-									img := gd.Img.Tree
-									t.SubImages[0].Image = img
+									t.SubImages[0].Image = gd.Img.Tree
 									t.Status = tree
 									g.ActiveTiles[Point{t.X, t.Y}] = t
 								}
@@ -203,19 +195,23 @@ func updateGame(g *Game) {
 											firecount += 1
 										}
 									}
-									switch firecount {
-									case 5, 6, 7, 8:
-										prob = 75
-									case 3, 4:
-										prob = 45
-									case 2:
-										prob = 8
-									case 1:
-										prob = 5
-									}
-									if rand.Intn(100) < prob {
+									if firecount > 0 {
+										switch firecount {
+										case 5, 6, 7, 8:
+											prob = 30
+										case 4:
+											prob = 20
+										case 3:
+											prob = 10
+										case 2:
+											prob = 10
+										case 1:
+											prob = 1
+										}
+										if rand.Intn(1000) <= config.FireJumps/100*prob {
 
-										t.Status = fireSmall
+											t.Status = fireSmall
+										}
 									}
 								}
 
