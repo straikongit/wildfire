@@ -4,28 +4,16 @@ import (
 	"log"
 	"math/rand"
 	"os"
-
-	//	"github.com/gdamore/tcell"
-	//	"github.com/hajimehoshi/ebiten/v2"
-	//"strconv"
-	//"config"
 	"time"
 )
 
-/*
-type cell struct {
-	x                 int
-	y                 int
-	Neighbours        []*cell
-	Rune              rune
-	fireDuration      int
-	wastelandDuration int
-	hitbyLightning    bool
-	lastRune          rune
-	style             tcell.Style
-	laststyle         tcell.Style
+type statistics struct {
+	trees     int
+	fireSmall int
+	fireFull  int
+	wasteLand int
 }
-*/
+
 type status int
 
 const (
@@ -71,6 +59,7 @@ var Width, Height int
 var pause bool
 
 var showDebugInfo bool
+var stats statistics
 
 func updateGame(g *Game) {
 
@@ -89,32 +78,6 @@ func updateGame(g *Game) {
 	config = *LoadConfig("1024x768")
 	timer1 := time.NewTicker(2 * time.Second)
 	quit := make(chan struct{})
-	/*
-				go func() {
-					for {
-						ev := scn.PollEvent()
-						logger.Println(ev)
-						switch event := ev.(type) {
-
-						case *tcell.EventKey:
-
-							switch event.Key() {
-
-							case tcell.KeyEscape:
-								close(quit)
-							case tcell.KeyCtrlC:
-								close(quit)
-							case tcell.KeyCtrlSpace:
-								pause = !pause
-							case 256: // Space
-								pause = !pause
-							}
-						}
-
-					}
-				}()
-		loop:
-	*/
 	w := gd.ScreenWidth
 	h := gd.ScreenHeight
 	for {
@@ -168,6 +131,7 @@ func updateGame(g *Game) {
 									}
 								}
 								switch count {
+
 								case 5, 6, 7, 8:
 									prob = config.CreateNewTree * 7000
 								case 3, 4:
@@ -177,10 +141,12 @@ func updateGame(g *Game) {
 								case 1:
 									prob = config.CreateNewTree * 1000
 								}
-								if rand.Intn(w*h*10) <= prob {
+								if rand.Intn(w*h*20) <= prob {
+
 									t.SubImages[0].Image = gd.Img.Tree
 									t.Status = tree
 									g.ActiveTiles[Point{t.X, t.Y}] = t
+									stats.trees++
 								}
 							case tree:
 								//check for lightnings first
@@ -202,7 +168,7 @@ func updateGame(g *Game) {
 										case 4:
 											prob = 20
 										case 3:
-											prob = 10
+											prob = 15
 										case 2:
 											prob = 10
 										case 1:
@@ -211,6 +177,7 @@ func updateGame(g *Game) {
 										if rand.Intn(1000) <= config.FireJumps/100*prob {
 
 											t.Status = fireSmall
+											stats.fireSmall++
 										}
 									}
 								}
@@ -221,6 +188,8 @@ func updateGame(g *Game) {
 								t.fireDuration++
 								if t.fireDuration > config.FireDurationSmall {
 									t.Status = fireFull
+									stats.fireSmall--
+									stats.fireFull++
 								}
 							case fireFull:
 
@@ -230,6 +199,9 @@ func updateGame(g *Game) {
 								t.fireDuration++
 								if t.fireDuration > config.FireDurationFull {
 									t.Status = wasteland
+									stats.wasteLand++
+									stats.trees--
+									stats.fireFull--
 								}
 							case wasteland:
 
@@ -247,6 +219,7 @@ func updateGame(g *Game) {
 									t.fireDuration = 0
 									t.Status = empty
 									delete(g.ActiveTiles, Point{t.X, t.Y})
+									stats.wasteLand--
 								}
 
 							}

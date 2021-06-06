@@ -29,6 +29,30 @@ type GameData struct {
 	Img          GameImages
 }
 
+// suentel.png, tree4x4.png, 1024x768
+func (g *GameData) init() {
+	//g := GameData{
+	g.ScreenWidth = 1024 / 2
+	g.ScreenHeight = 768 / 2
+	g.TileWidth = 2
+	g.TileHeight = 2
+	g.MapFileName = "assets/suentel.png"
+	g.TreeFileName = "assets/tree4x4.png"
+	g.FireFileName = "assets/fire/fire.png"
+}
+
+/*
+// suentel2048.png, tree4x4.png, 2048x1536
+func (g *GameData) init() {
+	//g := GameData{
+	g.ScreenWidth = 2048 / 2
+	g.ScreenHeight = 1536 / 2
+	g.TileWidth = 2
+	g.TileHeight = 2
+	g.MapFileName = "assets/suentel2048.png"
+	g.TreeFileName = "assets/tree4x4.png"
+	g.FireFileName = "assets/fire/fire.png"
+}
 // map.png, tree16x16.png
 func (g *GameData) init() {
 	//g := GameData{
@@ -40,8 +64,6 @@ func (g *GameData) init() {
 	g.TreeFileName = "assets/tree4x4.png"
 	g.FireFileName = "assets/fire/fire.png"
 }
-
-/*
 // map.png, tree8x8.png
 func (g *GameData) init() {
 	//g := GameData{
@@ -260,10 +282,18 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			`TPS: %0.2f
 	FPS: %0.2f
 	Num of tiles: %d
+	Num of trees: %d
+	Num of Fire small: %d
+	Num of Fire Full: %d
+	Num of Wasteland: %d
 	Press Space to pause game`,
 			ebiten.CurrentTPS(),
 			ebiten.CurrentFPS(),
-			len(g.ActiveTiles))
+			len(g.ActiveTiles),
+			stats.trees,
+			stats.fireSmall,
+			stats.fireFull,
+			stats.wasteLand)
 		ebitenutil.DebugPrint(screen, msg)
 	}
 }
@@ -291,7 +321,7 @@ func (g *Game) Update() error {
 		}
 
 	}
-		return nil
+	return nil
 
 }
 func main() {
@@ -303,9 +333,9 @@ func main() {
 	g.ActiveTiles = make(map[Point]*Tile)
 	ebiten.SetWindowResizable(true)
 	ebiten.SetWindowSize(400, 300)
-	//ebiten.SetWindowSize(1024, 768)
+	//ebiten.SetWindowSize(2048, 1536)
 	ebiten.SetWindowTitle("Wildfire")
-			lastKeyPressed = time.Now()
+	lastKeyPressed = time.Now()
 	go updateGame(g)
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
