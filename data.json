@@ -1,14 +1,14 @@
 {
     "Configs": {
         "1024x768": {
-            "FireDurationFull": 500,
-            "FireDurationSmall": 10,
-            "WastelandDuration": 50,
+            "FireDurationFull": 800,
+            "FireDurationSmall": 20,
+            "WastelandDuration": 1250,
             "Lightnings": 10,
             "LightningStartsFire": 1,
-            "CreateNewTree": 4,
+            "CreateNewTree": 2,
             "FireJumps": 5000,
-            "PausePerRound": 1
+            "PausePerRound": 2
         },
         "slow": {
             "FireDurationFull": 20,
