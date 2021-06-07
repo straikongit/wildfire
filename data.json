@@ -4,7 +4,7 @@
             "FireDurationFull": 800,
             "FireDurationSmall": 20,
             "WastelandDuration": 1250,
-            "Lightnings": 10,
+            "Lightnings": 4,
             "LightningStartsFire": 1,
             "CreateNewTree": 2,
             "FireJumps": 5000,

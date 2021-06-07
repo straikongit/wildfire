@@ -12,10 +12,8 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	//	"sync"
 )
 
-//var MapFileName string
 var gd GameData
 
 type GameData struct {
@@ -31,7 +29,6 @@ type GameData struct {
 
 // suentel.png, tree4x4.png, 1024x768
 func (g *GameData) init() {
-	//g := GameData{
 	g.ScreenWidth = 1024 / 2
 	g.ScreenHeight = 768 / 2
 	g.TileWidth = 2
@@ -44,7 +41,6 @@ func (g *GameData) init() {
 /*
 // suentel2048.png, tree4x4.png, 2048x1536
 func (g *GameData) init() {
-	//g := GameData{
 	g.ScreenWidth = 2048 / 2
 	g.ScreenHeight = 1536 / 2
 	g.TileWidth = 2
@@ -158,8 +154,6 @@ func (g *GameData) LoadSubImages() {
 	g.Img.FireFull = append(g.Img.FireFull, imgFire.SubImage(image.Rect(0, p.Y/2-1, p.X/2, p.Y-1)).(*ebiten.Image))
 	g.Img.FireFull = append(g.Img.FireFull, imgFire.SubImage(image.Rect(p.X/2, p.Y/2, p.X-1, p.Y-1)).(*ebiten.Image))
 
-	//return img
-	//imgTree, _, _ = ebitenutil.NewImageFromFile(gd.TreeFileName)
 }
 
 type Game struct {
@@ -192,41 +186,33 @@ var mutex = &sync.Mutex{}
 var m Map
 
 func CreateTiles(g *Game) {
-	//allTiles := make([][]Tile, gd.ScreenWidth)
 	rand.Seed(time.Now().Unix())
 
 	m.Load(gd.MapFileName)
 
 	m.TileWidth = gd.TileWidth
 	m.TileHeight = gd.TileHeight
-	//m.MakeMapSubImages(img)
 	g.Tiles = make([][]Tile, gd.ScreenWidth)
 	for x := range g.Tiles {
 
 		tiles := make([]Tile, gd.ScreenHeight)
 		for y := range tiles {
 			tile := Tile{
-				X:       x * gd.TileWidth,
-				Y:       y * gd.TileHeight,
-				OffsetX: rand.Intn(gd.TileWidth),
-				OffsetY: rand.Intn(gd.TileHeight),
-				Status:  empty,
-				//Properties: make( Properties[string]bool{},0),
-				//Properties: make(map[string]bool),
+				X:         x * gd.TileWidth,
+				Y:         y * gd.TileHeight,
+				OffsetX:   rand.Intn(gd.TileWidth),
+				OffsetY:   rand.Intn(gd.TileHeight),
+				Status:    empty,
 				SubImages: make([]SubImage, 5),
 			}
 			tile.Properties = m.GetProperties(tile)
 
-			//	tile.MapImage = m.SubImages[x][y]
 			tiles[y] = tile
-			//g.Tiles[x][y] = tile
 		}
 
 		g.Tiles[x] = tiles
 	}
 
-	//m.MakeTileProperties(&g, img)
-	//return allTiles
 	g.Tiles = getNeighbours(g.Tiles)
 }
 
@@ -240,42 +226,24 @@ func leftTouched() bool {
 	return false
 }
 
-/*
-func (g *Game) Update(screen *ebiten.Image) error {
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) || leftTouched() {
-		log.Println("left")
-	}
-
-	return nil
-}
-*/
-
 // Draw draws the game screen.
 // Draw is called every frame (typically 1/60[s] for 60Hz display).
 func (g *Game) Draw(screen *ebiten.Image) {
-	//img1, _, _ := ebitenutil.NewImageFromFile("assets/tree1.png")
-	//log.Println(len(g.ActiveTiles))
 	screen.DrawImage(ebiten.NewImageFromImage(m.Image), nil)
 	var op = &ebiten.DrawImageOptions{}
 	mutex.Lock()
 	for _, tile := range g.ActiveTiles {
 
-		//for _, tile := range tiles {
-
-		//wg.Wait()
 		for _, s := range tile.SubImages {
 			if s.Image != nil {
 
 				op = &ebiten.DrawImageOptions{}
 				op.GeoM.Translate(float64(tile.X-tile.OffsetX), float64(tile.Y-tile.OffsetY))
 				screen.DrawImage(s.Image, op)
-				//s.Image = nil
 			}
 		}
-
-		//}
-
 	}
+
 	mutex.Unlock()
 	if showDebugInfo {
 		msg := fmt.Sprintf(
@@ -313,17 +281,15 @@ func (g *Game) Update() error {
 
 		if ebiten.IsKeyPressed(ebiten.KeySpace) || leftTouched() {
 			pause = !pause
-			lastKeyPressed = time.Now()
 		}
 		if ebiten.IsKeyPressed(ebiten.KeyI) || leftTouched() {
 			showDebugInfo = !showDebugInfo
-			lastKeyPressed = time.Now()
 		}
-
+		lastKeyPressed = time.Now()
 	}
 	return nil
-
 }
+
 func main() {
 	Printme()
 	gd.init()
