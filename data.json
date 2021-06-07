@@ -3,10 +3,10 @@
         "1024x768": {
             "FireDurationFull": 800,
             "FireDurationSmall": 20,
-            "WastelandDuration": 250,
-            "Lightnings": 5,
+            "WastelandDuration": 1250,
+            "Lightnings": 10,
             "LightningStartsFire": 1,
-            "CreateNewTree": 10,
+            "CreateNewTree": 2,
             "FireJumps": 5000,
             "PausePerRound": 2
         },
