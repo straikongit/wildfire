@@ -74,7 +74,7 @@ func updateGame(g *Game) {
 	//logger.ende
 
 	var config Config
-	//config.init()
+
 	config = *LoadConfig("1024x768")
 	timer1 := time.NewTicker(2 * time.Second)
 	quit := make(chan struct{})
@@ -124,7 +124,6 @@ func updateGame(g *Game) {
 								//prob := 400
 								var count int
 								for _, n := range t.Neighbours {
-									//if n.Status != empty {
 									if n.Status == tree {
 										count++
 										//prob = prob + 3000
@@ -153,6 +152,7 @@ func updateGame(g *Game) {
 								var prob int
 								if rand.Intn(w*h*1000) <= config.Lightnings {
 									t.Status = fireSmall
+									stats.fireSmall++
 								} else {
 
 									var firecount int
@@ -206,12 +206,8 @@ func updateGame(g *Game) {
 							case wasteland:
 
 								if len(t.SubImages) > 0 {
-									// `Add(1) signifies that there is 1 task that we need to wait for
-									//	wg.Add(1)
 									t.SubImages = nil
 									t.SubImages = make([]SubImage, 5)
-									// Calling `wg.Done` indicates that we are done with the task we are waiting fo
-									//	defer wg.Done()
 								}
 								t.wastelandDuration++
 								if t.wastelandDuration > config.WastelandDuration {
@@ -234,5 +230,4 @@ func updateGame(g *Game) {
 
 	}
 	logger.Println("Stop")
-	//logger.ende
 }
